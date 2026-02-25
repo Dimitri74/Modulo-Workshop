@@ -19,15 +19,15 @@ public interface TimeApiService {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Timeout(1000L)
-   /* @Fallback(
+    @Fallback(
             fallbackMethod = "getTimeFallback"
-    )*/
-    /*@CircuitBreaker(
+    )
+    @CircuitBreaker(
             requestVolumeThreshold = 4,
             failureRatio = .5,
             delay = 3000L,
             successThreshold = 2
-    )*/
+    )
     public String getTime();
 
     default String getTimeFallback(){
