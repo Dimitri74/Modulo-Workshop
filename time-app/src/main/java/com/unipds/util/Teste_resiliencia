@@ -1,0 +1,12 @@
+while($true) {
+     # Chama a APP que contém a lógica de resiliência
+     Invoke-RestMethod -Uri "http://localhost:8082/time-app"
+     Start-Sleep -Milliseconds 500
+ }
+--Teste de resiliencia.
+while($true) {
+    $resp = Invoke-RestMethod -Uri "http://localhost:8082/time-app"
+    $time = Get-Date -Format "HH:mm:ss"
+    Write-Host "[$time] Resposta: $resp"
+    Start-Sleep -Milliseconds 200
+}
