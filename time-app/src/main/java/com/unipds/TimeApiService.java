@@ -10,7 +10,9 @@ import org.eclipse.microprofile.faulttolerance.Fallback;
 import org.eclipse.microprofile.faulttolerance.Timeout;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 //"http://time-api-eldermoraes-dev.apps.rm2.thpm.p1.openshiftapps.com/time-api"
-@RegisterRestClient(baseUri = "http://localhost:8081/time-api")
+//@RegisterRestClient(baseUri = "http://localhost:8081/time-api")
+//@RegisterRestClient(baseUri = "http://localhost:31577/time-app")
+@RegisterRestClient(baseUri = "http://host.docker.internal:8081/time-api")
 public interface TimeApiService {
 
     public static final String MSG_ERRO = "Ocorreu um erro ";

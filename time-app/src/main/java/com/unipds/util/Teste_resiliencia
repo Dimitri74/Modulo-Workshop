@@ -10,3 +10,52 @@ while($true) {
     Write-Host "[$time] Resposta: $resp"
     Start-Sleep -Milliseconds 200
 }
+
+--startar o kubernetes:
+# Este comando faz o build da imagem Docker e gera/aplica os manifestos no Kubernetes
+.\mvnw.cmd clean package -Dquarkus.container-image.build=true -Dquarkus.kubernetes.deploy=true
+--Instruções:
+1. Configurações Realizadas
+Atualizei o arquivo src/main/resources/application.properties com as seguintes propriedades:
+quarkus.kubernetes.service-type=node-port: Isso cria um serviço do tipo NodePort, permitindo que você acesse a aplicação no Kubernetes usando o IP do seu computador e uma porta alta (ex: 30000+), o que é ideal para testes locais.
+quarkus.kubernetes.ingress.expose=true: Prepara a exposição da aplicação.
+quarkus.micrometer.export.prometheus.enabled=true: Garante que o endpoint /q/metrics esteja ativo para fornecer os dados ao Prometheus (que gera o gráfico/plot).
+Ajustes de Imagem: Configurei para que a imagem seja construída com o nome unipds/time-app:1.0-SNAPSHOT no registro local do Docker.
+2. Passo-a-passo e Comandos
+Siga estes passos para subir a aplicação e ver o gráfico:
+Passo 1: Certifique-se que o Kubernetes está Ativo No ícone do Docker Desktop na barra de tarefas:
+1.Vá em Settings > Kubernetes.
+2.Marque Enable Kubernetes.
+3.Aguarde o status ficar verde (Kubernetes is running).
+Passo 2: Build e Deploy no Kubernetes Local Execute o comando abaixo no terminal (na pasta raiz time-app):
+# Este comando faz o build da imagem Docker e gera/aplica os manifestos no Kubernetes
+.\mvnw.cmd clean package -Dquarkus.container-image.build=true -Dquarkus.kubernetes.deploy=true
+Passo 3: Verificar a Aplicação no Kubernetes
+# Verifique se o pod está "Running"
+kubectl get pods
+
+# Verifique a porta (PORT) mapeada pelo NodePort
+kubectl get svc time-app
+Procure por algo como 8082:3XXXX/TCP. A porta 3XXXX é a que você usará no navegador.
+Passo 4: Acessar as Métricas para o Plot Abra no navegador: http://localhost:<PORTA_NODEPORT>/q/metrics. Você verá os dados brutos que o Prometheus usa para desenhar os gráficos.
+3. Como Gerar o "Plot" (Gráfico)
+Para o Kubernetes do Docker Desktop, a forma mais rápida de ver o gráfico sem instalar um Prometheus completo é usar o Kubernetes Dashboard:
+1.
+Habilitar o Dashboard (se não tiver):
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.7.0/aio/deploy/recommended.yaml
+2.
+Acessar o Gráfico de Recursos: O Dashboard do Kubernetes mostrará o "Plot" de CPU e Memória automaticamente.
+3.
+Para o Plot de Resiliência (Circuit Breaker): Como você está em ambiente local, o "Plot" desejado das métricas do Quarkus pode ser visto instalando uma instância rápida do Prometheus via Docker:
+docker run -d --name prometheus -p 9090:9090 prom/prometheus
+(Configurando-o para ler o IP da sua máquina na porta do NodePort).
+Resumo dos comandos usados:
+•
+.\mvnw.cmd package ...: Compila, gera a imagem Docker e faz o deploy automático no K8s.
+•
+kubectl get pods: Lista os containers rodando no cluster local.
+•
+kubectl get svc: Mostra os serviços e as portas externas para acesso.
+•
+kubectl logs -f <nome-do-pod>: Para ver os logs da aplicação rodando no Kubernetes.
+Dessa forma, sua aplicação agora está "Kubernetes Ready" para rodar diretamente no seu Docker Desktop!
